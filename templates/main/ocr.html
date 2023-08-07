@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    OCR
+{% endblock title %}
+
+{% block content %}
+    <div class="centered-content">
+        <div class="ui segment">
+            <h3>OCR (Auto Segmentation)</h3>
+            <form method="POST" enctype="multipart/form-data" id="ocr-form">
+                {% csrf_token %}
+
+                <div id="success-message" class="ui green message" style="display: none;">
+                    <div class="header">Success</div>
+                    <p>OCR image successfully processed and saved!</p>
+                </div>
+
+                <div class="ui segment text-center mb-3">
+                    <label for="title">OCR Title:</label>
+                    <div class="textarea-container">
+                        <textarea name="title" cols="40" rows="2" required="" id="title"></textarea>
+                    </div>
+                </div>
+                <div class="ui segment text-center mb-3">
+                    <label for="image">Upload Image:</label>
+                    <input type="file" id="image" name="image" class="form-control-file">
+                </div>
+                <div class="ui segment">
+                    <div class="ui two column grid">
+                        <div class="column">
+                            <label for="title" style="font-size: 28px; font-weight: bold;">Original Image:</label>
+                            <!-- Element to display the selected image -->
+                            <div class="ui segment">
+                                <img id="fully-segmented-image" src="" alt="Preview Image" style="max-width: 100%; margin-bottom: 15px;">
+                            </div>
+                        </div>
+                        <div class="column">
+                            <label for="title" style="font-size: 28px; font-weight: bold;">Fully Segmented Image:</label>
+                            <!-- Element to display the fully segmented image -->
+                            <div class="ui segment">
+                                <img id="preview-image" src="" alt="Fully Segmented Image" style="max-width: 100%; margin-bottom: 15px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Add a button to trigger image segmentation -->
+                <div class="text-center">
+                    <button type="button" id="segment-image" class="btn btn-primary">Segment Image</button>
+                </div>
+            </form>
+        </div>
+        <!-- Add a container for the segmented images and options -->
+        <label for="title" style="font-size: 28px; font-weight: bold;">Individual Segmented Images:</label>
+        <br>
+        Please confirm if the image contains math equation or normal text with checkboxes
+        <div class="text-center mb-3" id="image-options-container">
+            <!-- The segmented images and options will be added here -->
+        </div>
+        <!-- Add a button to submit the form -->
+        <div class="text-center">
+            <button type="button" id="submit-ocr" class="ui positive button w-full mt-5">Perform OCR</button>
+        </div>
+    </div>
+
+    <style>
+        .image-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .image-table-row {
+            border-bottom: 1px solid #ccc;
+        }
+
+        .image-table-cell {
+            padding: 20px;
+            vertical-align: middle;
+            text-align: center;
+            display: flex;
+            justify-content: space-between; /* Move the dropdown to the right side */
+        }
+
+        .segmented-image {
+            max-width: 400px; /* Increase the maximum width */
+            max-height: 300px; /* Increase the maximum height */
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Image element for previewing and segmenting
+            const previewImage = document.getElementById('preview-image');
+            const fullySegmentedImage = document.getElementById('fully-segmented-image');
+
+            // Input element for file upload
+            const imageInput = document.getElementById('image');
+
+            // Button to trigger image segmentation
+            const segmentImageBtn = document.getElementById('segment-image');
+
+            // Container to hold segmented images and options
+            const imageOptionsContainer = document.getElementById('image-options-container');
+
+            // Function to update the preview image and fully segmented image with the selected file
+            imageInput.addEventListener('change', function () {
+                const file = imageInput.files[0];
+                const reader = new FileReader();
+                reader.onloadend = function () {
+                    previewImage.src = reader.result;
+                    fullySegmentedImage.src = reader.result;
+                };
+                if (file) {
+                    reader.readAsDataURL(file);
+                } else {
+                    previewImage.src = '';
+                    fullySegmentedImage.src = '';
+                }
+            });
+
+            // Function to perform image segmentation and return a promise
+            function segmentImage() {
+                const formData = new FormData();
+                formData.append('image', imageInput.files[0]);
+
+                return new Promise((resolve, reject) => {
+                    // Get the CSRF token
+                    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                    // Send the image data to the server for segmentation
+                    $.ajax({
+                        url: '{% url "segment-image" %}',  // Replace with the URL to your segmentation view
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            'X-CSRFToken': csrftoken,
+                        },
+                        success: function (res) {
+                            resolve(res); // Resolve the promise with the response
+                        },
+                        error: function () {
+                            reject('Failed to perform image segmentation.');
+                        }
+                    });
+                });
+            }
+
+            // Event listener to trigger image segmentation when the "Segment Image" button is clicked
+            segmentImageBtn.addEventListener('click', function () {
+                segmentImage().then((res) => {
+                    response = res; // Assign the response to the outer scoped variable
+                    // Update the preview image with the fully segmented image
+                    previewImage.src = 'data:image/png;base64, ' + response.full_image_segmented;
+
+                    // Clear the segmented image container before adding the new content
+                    imageOptionsContainer.innerHTML = '';
+
+                    // Iterate through the segmented images and add them to the table
+                    response.segmented_images.forEach((segmentedImage, index) => {
+                        const imageContainer = document.createElement('div');
+                        imageContainer.classList.add('image-table-row');
+
+                        const imageCell = document.createElement('div');
+                        imageCell.classList.add('image-table-cell');
+
+                        const imgElement = document.createElement('img');
+                        imgElement.classList.add('segmented-image');
+                        imgElement.src = 'data:image/png;base64, ' + segmentedImage;
+
+                        const dropdown = document.createElement('select');
+                        dropdown.name = `segmented_dropdown_${index + 1}`;
+                        dropdown.innerHTML = `
+                            <option value="text">Text</option>
+                            <option value="math">Math</option>
+                        `;
+
+                        imageCell.appendChild(imgElement);
+                        imageCell.appendChild(dropdown);
+                        imageContainer.appendChild(imageCell);
+
+                        imageOptionsContainer.appendChild(imageContainer);
+                    });
+
+                    // Show the submit button
+                    document.getElementById('submit-ocr').style.display = 'block';
+                }).catch((error) => {
+                    alert(error);
+                });
+            });
+
+            document.getElementById('submit-ocr').addEventListener('click', function () {
+                if (!response) {
+                    alert('Please perform image segmentation first.');
+                    return;
+                }
+
+                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                // Get the title from the form
+                const title = document.getElementById('title').value;
+
+                // Get the original image file from the form
+                const originalImageFile = document.getElementById('image').files[0];
+                const segImageFile = document.getElementById('preview-image');
+
+                // Convert the original image file to base64
+                const reader = new FileReader();
+                reader.onloadend = function () {
+                    const originalImageBase64 = reader.result.split(',')[1];
+
+                    // Create an array to hold the segmented image data and OCR types
+                    const imageAndOCRData = [];
+                    const dropdowns = document.querySelectorAll('[name^="segmented_dropdown_"]');
+                    dropdowns.forEach((dropdown, index) => {
+                        const imageBase64 = response.segmented_images[index];
+                        const ocrType = dropdown.value;
+                        imageAndOCRData.push({ imageBase64, ocrType });
+                    });
+
+                    const previewCanvas = document.createElement('canvas');
+                    previewCanvas.width = previewImage.width;
+                    previewCanvas.height = previewImage.height;
+
+                    const previewCtx = previewCanvas.getContext('2d');
+                    previewCtx.drawImage(previewImage, 0, 0, previewCanvas.width, previewCanvas.height);
+
+                    const previewImageBase64 = previewCanvas.toDataURL('image/jpeg').split(',')[1];
+
+                    // Prepare data to send to the server
+                    const formData = new FormData();
+                    formData.append('title', title);
+                    formData.append('image', originalImageFile);
+                    formData.append('preview-image', previewImageBase64);
+                    formData.append('image_data', JSON.stringify(imageAndOCRData));
+
+                    // Send the data to the server for processing OCR results
+                    $.ajax({
+                        url: '{% url "submit-marked-data" %}',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            'X-CSRFToken': csrftoken,
+                        },
+                        success: function (response) {
+                            // Display or process the combined OCR text returned from the server
+                            console.log(response.combined_ocr_text);
+                            const successMessage = document.getElementById('success-message');
+                            successMessage.style.display = 'block';
+
+                            // Reset the form fields and images after successful save
+                            resetForm();
+                        },
+                        error: function () {
+                            alert('Failed to submit OCR data.');
+                        }
+                    });
+                };
+                reader.readAsDataURL(originalImageFile);
+            });
+
+            function resetForm() {
+                // Clear the input fields
+                document.getElementById('title').value = '';
+                document.getElementById('image').value = '';
+                previewImage.src = '';
+                fullySegmentedImage.src = '';
+
+                // Hide the segmented images and submit button
+                imageOptionsContainer.innerHTML = '';
+                document.getElementById('submit-ocr').style.display = 'none';
+            }
+        });
+    </script>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

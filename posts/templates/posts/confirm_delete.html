@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}
+    Delete Post
+{% endblock title %}
+{% block content %}
+    <div id="content-container" class="container p-none">
+        <div class="side-p">
+            <h3>Are you sure?</h3>
+            <p>You're about to delete "{{ object }}". Please confirm.</p>
+            <form action="" method="post">
+                {% csrf_token %}
+                <input class="ui button"
+                       type="button"
+                       value="Cancel"
+                       onclick="window.history.go(-1);"/>
+                <input class="ui button positive" type="submit" value="Confirm" />
+            </form>
+        </div>
+    </div>
+{% endblock content %}

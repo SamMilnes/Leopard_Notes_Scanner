@@ -1,0 +1,9 @@
+Pillow
+python-dotenv
+Django
+django-allauth
+psycopg2-binary
+django_extensions
+pytesseract
+numpy
+pix2text

@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    OCR
+{% endblock title %}
+
+{% block content %}
+    <div class="centered-content">
+        <div class="ui segment">
+            <h3>OCR (Custom Snipping)</h3>
+            <form method="POST" enctype="multipart/form-data" id="ocr-form">
+                {% csrf_token %}
+                <!-- Success message -->
+                <div id="success-message" class="ui green message" style="display: none;">
+                    <div class="header">Success</div>
+                    <p>OCR image successfully processed and saved!</p>
+                </div>
+                <div class="ui segment text-center mb-3">
+                    <label for="image">Upload Image:</label>
+                    <input type="file" id="image" name="image" class="form-control-file">
+                </div>
+
+                <div class="ui segment text-center mb-3">
+                    <label for="title">OCR Title:</label>
+                    <div class="textarea-container">
+                        <textarea name="title" cols="40" rows="2" required="" id="title"></textarea>
+                    </div>
+                </div>
+                <div class="ui segment text-center mb-3">
+                    <label for="ocr_switch">OCR Type:</label>
+                    <select id="ocr_switch" name="ocr_switch" class="form-control">
+                        <option value="text">Text OCR</option>
+                        <option value="math">Math OCR</option>
+                    </select>
+                </div>
+                <!-- Add an image container -->
+                <div class="ui segment text-center mb-3">
+                    <div class="image-container text-center mb-3">
+                        <img id="preview-image" src="" alt="Preview Image">
+                    </div>
+
+                    <!-- Add a button to trigger the snipping tool -->
+                    <div class="text-center">
+                        <button type="button" id="open-snipping" class="btn btn-primary">Open Snipping Tool</button>
+                    </div>
+                </div>
+                <!-- Add hidden input fields to store the snipped and original image data -->
+                <input type="hidden" id="snipped_image_data" name="snipped_image_data">
+                <input type="hidden" id="original_image_data" name="original_image_data">
+                <!-- Add a button to submit the form -->
+                <div class="text-center">
+                    <button type="button" id="submit-ocr" class="btn btn-primary" style="display: none;">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Include CropperJS library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.9/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.9/cropper.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Image element for previewing and snipping
+            const previewImage = document.getElementById('preview-image');
+
+            // Input element for file upload
+            const imageInput = document.getElementById('image');
+
+            // Hidden input field for storing snipped image data
+            const snippedImageDataInput = document.getElementById('snipped_image_data');
+
+            // Hidden input field for storing original image data
+            const originalImageDataInput = document.getElementById('original_image_data');
+
+            // Button to trigger the snipping tool
+            const openSnippingBtn = document.getElementById('open-snipping');
+
+            // Button to submit the form
+            const submitBtn = document.getElementById('submit-ocr');
+
+            // Function to update the preview image with the selected file
+            imageInput.addEventListener('change', function () {
+                const file = imageInput.files[0];
+                const reader = new FileReader();
+                reader.onloadend = function () {
+                    previewImage.src = reader.result;
+                    // Update the original image data
+                    originalImageDataInput.value = reader.result;
+                };
+                if (file) {
+                    reader.readAsDataURL(file);
+                } else {
+                    previewImage.src = '';
+                    originalImageDataInput.value = '';
+                }
+            });
+
+            // Function to open the snipping tool
+            function openSnippingTool() {
+                // Initialize the CropperJS instance if it's not already initialized
+                if (!window.cropper) {
+                    window.cropper = new Cropper(previewImage, {
+                        aspectRatio: NaN, // You can set a fixed aspect ratio if needed
+                        viewMode: 1, // Restrict the cropping to the preview area
+                        crop(event) {
+                            // Update the hidden input field with the snipped image data
+                            snippedImageDataInput.value = cropper.getCroppedCanvas().toDataURL('image/jpeg');
+                        },
+                    });
+                } else {
+                    // Reset the CropperJS instance if it's already initialized
+                    cropper.reset();
+                }
+
+                // Hide the open snipping button and show the submit button
+                openSnippingBtn.style.display = 'none';
+                submitBtn.style.display = 'block';
+            }
+
+            // Event listener to open the snipping tool when the open snipping button is clicked
+            openSnippingBtn.addEventListener('click', openSnippingTool);
+
+            // Event listener to submit the form when the submit button is clicked
+            submitBtn.addEventListener('click', function () {
+                const snippedImageData = snippedImageDataInput.value;
+                const originalImageData = originalImageDataInput.value;
+                const ocrSwitchValue = document.getElementById('ocr_switch').value;
+                if (!snippedImageData) {
+                    // Prevent form submission if no image is snipped
+                    alert("Please snip the image first.");
+                } else {
+                    // Submit the form using AJAX
+                    const form = document.getElementById('ocr-form');
+                    const formData = new FormData(form);
+                    formData.append('image', originalImageData); // Append the original image data
+                    formData.append('ocr_switch', ocrSwitchValue);
+                    $.ajax({
+                        url: form.action,
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function () {
+                            // Show the success message
+                            const successMessage = document.getElementById('success-message');
+                            successMessage.style.display = 'block';
+
+                            // Clear other form fields and reset the preview image
+                            imageInput.value = '';
+                            document.getElementById('title').value = '';
+                            document.getElementById('ocr_switch').selectedIndex = 0;
+                            snippedImageDataInput.value = '';
+                            originalImageDataInput.value = '';
+
+                            // Clear the snipping tool
+                            if (window.cropper) {
+                                cropper.destroy();
+                                delete window.cropper;
+                                previewImage.src = '';
+                            }
+
+                            // Hide the submit button and show the open snipping button
+                            openSnippingBtn.style.display = 'block';
+                            submitBtn.style.display = 'none';
+                        },
+                        error: function () {
+                            alert('Failed to process the OCR image.');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock content %}
