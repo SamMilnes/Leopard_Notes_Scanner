@@ -1,23 +1,12 @@
 <h1 align="center">Leopard Notes Scanner</h1>
 
-## Features
-
-- Convert Images To Text
-- User Accounts
-- Segmentation
-- Snipping Tool
-- Public Feed
-- Messaging
-- Note Saving
-- Friends / Followers
 
 ## Instructions
 
-Clone this repository, cd into it
+Clone this repo and cd into it
 
 ```
-git clone
-cd Social-Network
+git clone git@github.com:SamMilnes/Leopard_Notes_Scanner.git
 ```    
 
 
