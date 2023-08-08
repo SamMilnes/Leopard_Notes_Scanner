@@ -10,7 +10,9 @@
 {% url 'ocr-view' as path_to_ocr %}
 {% url 'ocr-snip' as path_to_ocr_snip %}
 {% url 'ocr-view-results' as path_to_ocr_results %}
+{% load static %}
 <div class="navbar ui inverted menu nav mb-5">
+    <img src="{% static 'WIT_logo.png' %}" alt="WIT Logo" class="ui small image">
     <div class="ui container">
         <a href="{{ path_to_home }}"
            class="{% if request.path == path_to_home %}active{% endif %} item">

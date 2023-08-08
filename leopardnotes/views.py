@@ -249,13 +249,10 @@ def submit_marked_data(request):
             segmented_images.append(item['imageBase64'])
             selected_options[f'segmented_dropdown_{len(segmented_images)}'] = item['ocrType']
 
-        print(segmented_images)
-
         # Perform OCR on the segmented images with their respective OCR types
         ocr_results = processOCRResults(segmented_images, selected_options)
         # Combine the OCR results into a single string
         combined_ocr_text = '\n'.join(ocr_results)
-        print(combined_ocr_text)
 
         image = request.FILES.get('image')
         title = request.POST.get('title')
