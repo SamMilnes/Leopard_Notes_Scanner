@@ -7,8 +7,13 @@ Clone this repo and cd into it
 
 ```
 git clone git@github.com:SamMilnes/Leopard_Notes_Scanner.git
-```    
+```
 
+# Downloads
+[Download Python3.9](https://www.python.org/downloads/release/python-390/)
+[Download virtualenv](https://pypi.org/project/virtualenv/)
+[Download PostgreSql](https://www.postgresql.org/download/)
+[Download Tesseract OCR](https://tesseract-ocr.github.io/tessdoc/Installation.html)
 
 Download PostgreSql
 ```
