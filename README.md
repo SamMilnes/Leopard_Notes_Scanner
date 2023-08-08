@@ -97,5 +97,9 @@ python manage.py runserver
 - Pix2Tex
 - Git/Github
 
-
+## Resources / Links
+```
+Libraries and Versions
+[https://github.com/SamMilnes/Leopard_Notes_Scanner/blob/master/requirements.txt]
+```  
 
