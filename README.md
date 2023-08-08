@@ -99,7 +99,6 @@ python manage.py runserver
 
 ## Resources / Links
 ```
-Libraries and Versions
-[https://github.com/SamMilnes/Leopard_Notes_Scanner/blob/master/requirements.txt]
+Libraries and Versions [Libraries](https://pages.github.com/](https://github.com/SamMilnes/Leopard_Notes_Scanner/blob/master/requirements.txt)https://github.com/SamMilnes/Leopard_Notes_Scanner/blob/master/requirements.txt).
 ```  
 
