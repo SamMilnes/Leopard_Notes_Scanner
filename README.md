@@ -9,21 +9,15 @@ Clone this repo and cd into it
 git clone git@github.com:SamMilnes/Leopard_Notes_Scanner.git
 ```
 
-# Downloads
-[Download Python3.9](https://www.python.org/downloads/release/python-390/)
-[Download virtualenv](https://pypi.org/project/virtualenv/)
-[Download PostgreSql](https://www.postgresql.org/download/)
-[Download Tesseract OCR](https://tesseract-ocr.github.io/tessdoc/Installation.html)
+### Required Downloads
+- [Python3.9](https://www.python.org/downloads/release/python-390/)
+- [virtualenv](https://pypi.org/project/virtualenv/)
+- [PostgreSql](https://www.postgresql.org/download/)
+- [Tesseract OCR](https://tesseract-ocr.github.io/tessdoc/Installation.html)
 
-Download PostgreSql
-```
-https://www.postgresql.org/download/
-```
 
-Download Tesseract OCR
+Change Tesseract OCR Path
 ```
-https://tesseract-ocr.github.io/tessdoc/Installation.html
-
 Go to leopardnotes/views.py and change the line:
 pytesseract.pytesseract.tesseract_cmd = 'C://Program Files//Tesseract-OCR//tesseract.exe'
 To wherever your path is for the downloaded tesseract.
