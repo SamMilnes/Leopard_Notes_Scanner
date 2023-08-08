@@ -1,7 +1,7 @@
 <h1 align="center">Leopard Notes Scanner</h1>
 
 
-## Instructions
+# Instructions
 
 Clone this repo and cd into it
 
@@ -74,7 +74,7 @@ Run the **Django** server
 python manage.py runserver
 ```  
 
-## Technologies
+# Technologies Used
 - Python
 - CSS
 - HTML
@@ -86,7 +86,7 @@ python manage.py runserver
 - Pix2Tex
 - Git/Github
 
-## Resources / Links
+# Resources / Links
 - [Libraries](https://github.com/SamMilnes/Leopard_Notes_Scanner/blob/master/requirements.txt)
 - [Testing Code](https://github.com/SamMilnes/Leopard_Notes_Scanner/tree/master/Testing)
 - [OCR and Segmentation Implementation](https://github.com/SamMilnes/Leopard_Notes_Scanner/blob/master/leopardnotes/views.py)
