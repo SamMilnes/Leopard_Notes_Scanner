@@ -1,4 +1,5 @@
 <h1 align="center">Leopard Notes Scanner</h1>
+
 ![alt text](https://github.com/SamMilnes/Leopard_Notes_Scanner/blob/master/static/WIT_logo.png?raw=true)
 
 
