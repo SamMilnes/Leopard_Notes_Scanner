@@ -42,26 +42,30 @@ Start a new **Virtualenv**, activate it, install Python module requirements on i
 python -m venv venv
 cd venv/Scripts
 activate
-pip install -r requirements/base.txt
+pip install -r requirements.txt
 ```  
 Create a **PostgreSQL** database
 
 ```
 To activate postgresql in your terminal:
-Type "C:\Program Files\PostgreSQL\15\bin\psql" -U postgres -d
+Type "C:\Program Files\PostgreSQL\15\bin\psql" -U postgres
 Then type:
 CREATE DATABASE leopardnotesdb;
+Then type exit.
+-------------------------------------------------------------------------------------------------------
 Then create a user with a password, for example:
 "C:\Program Files\PostgreSQL\15\bin\psql" -U postgres -c "CREATE USER milness WITH PASSWORD 'password'"
+-------------------------------------------------------------------------------------------------------
 Then go into the database and grant all permissions to the user you created: 
 "C:\Program Files\PostgreSQL\15\bin\psql" -U postgres -d leopardnotesdb
 GRANT ALL PRIVILEGES ON SCHEMA public TO milness;
 ```
 
 Create a **.env** file in the root directory with enviroment variables of `APP_SECRET, DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT`
+APP_SECRET can be anything, for example 12345
 
 ```
-APP_SECRET=your_very_very_secure_secret_key
+APP_SECRET=12345
 DB_NAME=leopardnotesdb
 DB_USER=user
 DB_PASSWORD=password
@@ -69,11 +73,15 @@ DB_HOST=localhost
 DB_PORT=5432
 ``` 
 
-Apply migrations to the database and run the **Django** server 
+Apply migrations to the database
 
 ```
 python manage.py makemigrations
 python manage.py migrate 
+```
+Run the **Django** server 
+
+```
 python manage.py runserver
 ```  
 
