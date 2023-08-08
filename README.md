@@ -98,7 +98,6 @@ python manage.py runserver
 - Git/Github
 
 ## Resources / Links
-```
 Libraries and Versions [Libraries](https://github.com/SamMilnes/Leopard_Notes_Scanner/blob/master/requirements.txt).
-```  
+
 
