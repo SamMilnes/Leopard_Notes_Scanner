@@ -49,6 +49,7 @@ Create a **PostgreSQL** database
 ```
 To activate postgresql in your terminal:
 Type "C:\Program Files\PostgreSQL\15\bin\psql" -U postgres
+It will prompt for a password, it will be the word password.
 Then type:
 CREATE DATABASE leopardnotesdb;
 Then type exit.
