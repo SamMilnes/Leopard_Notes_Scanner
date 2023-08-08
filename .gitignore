@@ -1,6 +1,5 @@
 __pycache__
 .coverage
-../../PycharmProjects/LeopardNotesScanner/.env
 media/avatars
 media/posts
 media/fully_segmented_images
@@ -9,4 +8,3 @@ media/message_images
 media/ocr_images
 venv
 venv/
-../../PycharmProjects/LeopardNotesScanner/venv/
